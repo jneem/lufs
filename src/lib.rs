@@ -1,3 +1,6 @@
+//! The reference material for this crate is the ITU technical report available
+//! [here](https://www.itu.int/dms_pubrec/itu-r/rec/bs/R-REC-BS.1770-4-201510-I!!PDF-E.pdf)
+
 mod biquad;
 
 /// Takes a signal as input, which is assumed to be at 48kHz. Returns a filtered version of the
