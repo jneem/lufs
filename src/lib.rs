@@ -75,15 +75,17 @@ mod tests {
     #[test]
     fn sine_loudness() {
         // One second of 997Hz sine wave at 48kHz sample rate.
-        let sine = (0..48_000).map(|x| (x as f32 * 997.0 / 48_000.0).sin());
+        let sine =
+            (0..48_000).map(|x| (x as f32 * 997.0 * 2.0 * std::f32::consts::PI / 48_000.0).sin());
         let mut signal = sine.clone().collect::<Vec<_>>();
-        dbg!(loudness(signal.iter().copied()));
-        // FIXME: this isn't quite right: according to the reference, the loudness of a 997Hz sine
-        // wave should be -3.01, but we're getting less than that.
-        assert!((loudness(signal.iter().copied()) + 4.1415) < 0.001);
+        // According to the reference, the loudness of a 997Hz sine wave should be -3.01.
+        assert!((loudness(signal.iter().copied()) + 3.01).abs() < 0.001);
 
-        // Appending something very quiet won't change the loudness.
-        signal.extend(sine.map(|x| x / 5.0));
-        assert!((loudness(signal.iter().copied()) + 4.1415) < 0.001);
+        // Appending something very quiet won't increase the loudness. (It might decrease it a bit,
+        // because of the overlapping windows.)
+        signal.extend(sine.clone().map(|x| x / 10.0));
+        signal.extend(sine.clone().map(|x| x / 10.0));
+        signal.extend(sine.clone().map(|x| x / 10.0));
+        assert!(loudness(signal.iter().copied()) < -3.01);
     }
 }
